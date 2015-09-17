@@ -1,5 +1,7 @@
 package com.nerdability.android.rss.parser;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +9,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.nerdability.android.rss.RssService;
 import com.nerdability.android.rss.domain.Article;
+import com.nerdability.android.rss.domain.GoogleHotTrendItem;
 
 
 public class RssHandler extends DefaultHandler {
@@ -15,6 +19,9 @@ public class RssHandler extends DefaultHandler {
 	// Feed and Article objects to use for temporary storage
 	private Article currentArticle = new Article();
 	private List<Article> articleList = new ArrayList<Article>();
+
+    private List<GoogleHotTrendItem> hotTrendItems = new ArrayList<>();
+
 
 	// Number of articles added so far
 	private int articlesAdded = 0;
@@ -30,8 +37,6 @@ public class RssHandler extends DefaultHandler {
 		return articleList;
 	}
 
-
-
 	/* 
 	 * This method is called everytime a start element is found (an opening XML marker)
 	 * here we always reset the characters StringBuffer as we are only currently interested
@@ -40,26 +45,29 @@ public class RssHandler extends DefaultHandler {
 	 * (non-Javadoc)
 	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(String uri, String localName, String qName, Attributes atts) {
-		chars = new StringBuffer();
-	}
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        chars = new StringBuffer();
+        Log.d(RssService.TAG, String.format("startElement, url : %s, localName : %s, qName : %s, atts : %s", uri, localName, qName, attributes.toString()));
+    }
 
-
-
-	/* 
-	 * This method is called everytime an end element is found (a closing XML marker)
-	 * here we check what element is being closed, if it is a relevant leaf node that we are
-	 * checking, such as Title, then we get the characters we have accumulated in the StringBuffer
-	 * and set the current Article's title to the value
-	 * 
-	 * If this is closing the "entry", it means it is the end of the article, so we add that to the list
-	 * and then reset our Article object for the next one on the stream
-	 * 
-	 * 
-	 * (non-Javadoc)
-	 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
-	 */
+    /*
+         * This method is called everytime an end element is found (a closing XML marker)
+         * here we check what element is being closed, if it is a relevant leaf node that we are
+         * checking, such as Title, then we get the characters we have accumulated in the StringBuffer
+         * and set the current Article's title to the value
+         *
+         * If this is closing the "entry", it means it is the end of the article, so we add that to the list
+         * and then reset our Article object for the next one on the stream
+         *
+         *
+         * (non-Javadoc)
+         * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+         */
+    @Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
+
+        Log.d(RssService.TAG, String.format("endElement, url : %s, localName : %s, qName : %s", uri, localName, qName));
 
 		if (localName.equalsIgnoreCase("title")){
 			currentArticle.setTitle(chars.toString());
@@ -104,6 +112,7 @@ public class RssHandler extends DefaultHandler {
 	 * (non-Javadoc)
 	 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
 	 */
+    @Override
 	public void characters(char ch[], int start, int length) {
 		chars.append(new String(ch, start, length));
 	}

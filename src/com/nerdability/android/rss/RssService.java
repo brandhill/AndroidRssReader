@@ -26,6 +26,7 @@ import com.nerdability.android.rss.parser.RssHandler;
 
 public class RssService extends AsyncTask<String, Void, List<Article>> {
 
+    public static final String TAG = "RssService";
 	private ProgressDialog progress;
 	private Context context;
 	private ArticleListFragment articleListFrag;
@@ -39,40 +40,40 @@ public class RssService extends AsyncTask<String, Void, List<Article>> {
 
 
 	protected void onPreExecute() {
-		Log.e("ASYNC", "PRE EXECUTE");
+		Log.d(TAG, "PRE EXECUTE");
 		progress.show();
 	}
 
 
 	protected  void onPostExecute(final List<Article>  articles) {
-		Log.e("ASYNC", "POST EXECUTE");
+		Log.d(TAG, "POST EXECUTE");
 		articleListFrag.getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				for (Article a : articles){
-					Log.d("DB", "Searching DB for GUID: " + a.getGuid());
-					DbAdapter dba = new DbAdapter(articleListFrag.getActivity());
-		            dba.openToRead();
-		            Article fetchedArticle = dba.getBlogListing(a.getGuid());
-		            dba.close();
-					if (fetchedArticle == null){
-						Log.d("DB", "Found entry for first time: " + a.getTitle());
-						dba = new DbAdapter(articleListFrag.getActivity());
-			            dba.openToWrite();
-			            dba.insertBlogListing(a.getGuid());
-			            dba.close();
-					}else{
-						a.setDbId(fetchedArticle.getDbId());
-						a.setOffline(fetchedArticle.isOffline());
-						a.setRead(fetchedArticle.isRead());
-					}
-				}
-				ArticleListAdapter adapter = new ArticleListAdapter(articleListFrag.getActivity(), articles);
-				articleListFrag.setListAdapter(adapter);
-				adapter.notifyDataSetChanged();
-				
-			}
-		});
+            @Override
+            public void run() {
+                for (Article a : articles) {
+                    Log.d("DB", "Searching DB for GUID: " + a.getGuid());
+                    DbAdapter dba = new DbAdapter(articleListFrag.getActivity());
+                    dba.openToRead();
+                    Article fetchedArticle = dba.getBlogListing(a.getGuid());
+                    dba.close();
+                    if (fetchedArticle == null) {
+                        Log.d("DB", "Found entry for first time: " + a.getTitle());
+                        dba = new DbAdapter(articleListFrag.getActivity());
+                        dba.openToWrite();
+                        dba.insertBlogListing(a.getGuid());
+                        dba.close();
+                    } else {
+                        a.setDbId(fetchedArticle.getDbId());
+                        a.setOffline(fetchedArticle.isOffline());
+                        a.setRead(fetchedArticle.isRead());
+                    }
+                }
+                ArticleListAdapter adapter = new ArticleListAdapter(articleListFrag.getActivity(), articles);
+                articleListFrag.setListAdapter(adapter);
+                adapter.notifyDataSetChanged();
+
+            }
+        });
 		progress.dismiss();
 	}
 
@@ -95,16 +96,16 @@ public class RssService extends AsyncTask<String, Void, List<Article>> {
 			xr.parse(new InputSource(url.openStream()));
 
 
-			Log.e("ASYNC", "PARSING FINISHED");
+			Log.d(TAG, "PARSING FINISHED");
 			return rh.getArticleList();
 
 		} catch (IOException e) {
-			Log.e("RSS Handler IO", e.getMessage() + " >> " + e.toString());
+			Log.e(TAG, e.getMessage() + " >> " + e.toString());
 		} catch (SAXException e) {
-			Log.e("RSS Handler SAX", e.toString());
+			Log.e(TAG, e.toString());
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			Log.e("RSS Handler Parser Config", e.toString());
+			Log.e(TAG, e.toString());
 		}
 
 		return null;

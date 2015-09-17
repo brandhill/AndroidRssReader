@@ -9,13 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.nerdability.android.R;
 import com.nerdability.android.rss.RssService;
 
 public class ArticleListFragment extends ListFragment {
 
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
-    private static final String BLOG_URL = "http://blog.nerdability.com/feeds/posts/default";
+    private static final String URL = "http://www.google.cn/trends/hottrends/atom/feed?pn=p9";
     private Callbacks mCallbacks = sDummyCallbacks;
     private int mActivatedPosition = ListView.INVALID_POSITION;
     private RssService rssService;
@@ -112,6 +111,6 @@ public class ArticleListFragment extends ListFragment {
     
     private void refreshList(){
     	rssService = new RssService(this);
-        rssService.execute(BLOG_URL);
+        rssService.execute(URL);
     }
 }
