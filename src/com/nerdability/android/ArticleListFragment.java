@@ -14,7 +14,7 @@ import com.nerdability.android.rss.RssService;
 public class ArticleListFragment extends ListFragment {
 
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
-    private static final String URL = "http://www.google.cn/trends/hottrends/atom/feed?pn=p9";
+    private static final String URL = "http://www.google.com/trends/hottrends/atom/feed?pn=p12";
     private Callbacks mCallbacks = sDummyCallbacks;
     private int mActivatedPosition = ListView.INVALID_POSITION;
     private RssService rssService;

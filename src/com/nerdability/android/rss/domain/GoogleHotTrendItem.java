@@ -17,6 +17,7 @@ public class GoogleHotTrendItem implements Serializable{
     private String news_item_title;
     private String news_item_snippet;
     private String news_item_source;
+    private String news_item_url;
 
     public String getTitle() {
         return title;
@@ -96,5 +97,31 @@ public class GoogleHotTrendItem implements Serializable{
 
     public void setNews_item_source(String news_item_source) {
         this.news_item_source = news_item_source;
+    }
+
+    public String getNews_item_url() {
+        return news_item_url;
+    }
+
+    public void setNews_item_url(String news_item_url) {
+        this.news_item_url = news_item_url;
+    }
+
+
+    @Override
+    public String toString() {
+        return "GoogleHotTrendItem{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", link='" + link + '\'' +
+                ", pubDate='" + pubDate + '\'' +
+                ", picture='" + picture + '\'' +
+                ", picture_source='" + picture_source + '\'' +
+                ", approx_traffic='" + approx_traffic + '\'' +
+                ", news_item_title='" + news_item_title + '\'' +
+                ", news_item_snippet='" + news_item_snippet + '\'' +
+                ", news_item_source='" + news_item_source + '\'' +
+                ", news_item_url='" + news_item_url + '\'' +
+                '}';
     }
 }

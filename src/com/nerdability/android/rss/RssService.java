@@ -21,10 +21,11 @@ import com.nerdability.android.ArticleListFragment;
 import com.nerdability.android.adapter.ArticleListAdapter;
 import com.nerdability.android.db.DbAdapter;
 import com.nerdability.android.rss.domain.Article;
+import com.nerdability.android.rss.domain.GoogleHotTrendItem;
 import com.nerdability.android.rss.parser.RssHandler;
 
 
-public class RssService extends AsyncTask<String, Void, List<Article>> {
+public class RssService extends AsyncTask<String, Void, List<GoogleHotTrendItem>> {
 
     public static final String TAG = "RssService";
 	private ProgressDialog progress;
@@ -45,41 +46,56 @@ public class RssService extends AsyncTask<String, Void, List<Article>> {
 	}
 
 
-	protected  void onPostExecute(final List<Article>  articles) {
-		Log.d(TAG, "POST EXECUTE");
-		articleListFrag.getActivity().runOnUiThread(new Runnable() {
+//	protected  void onPostExecute(final List<Article>  articles) {
+//		Log.d(TAG, "POST EXECUTE");
+//		articleListFrag.getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                for (Article a : articles) {
+//                    Log.d("DB", "Searching DB for GUID: " + a.getGuid());
+//                    DbAdapter dba = new DbAdapter(articleListFrag.getActivity());
+//                    dba.openToRead();
+//                    Article fetchedArticle = dba.getBlogListing(a.getGuid());
+//                    dba.close();
+//                    if (fetchedArticle == null) {
+//                        Log.d("DB", "Found entry for first time: " + a.getTitle());
+//                        dba = new DbAdapter(articleListFrag.getActivity());
+//                        dba.openToWrite();
+//                        dba.insertBlogListing(a.getGuid());
+//                        dba.close();
+//                    } else {
+//                        a.setDbId(fetchedArticle.getDbId());
+//                        a.setOffline(fetchedArticle.isOffline());
+//                        a.setRead(fetchedArticle.isRead());
+//                    }
+//                }
+//                ArticleListAdapter adapter = new ArticleListAdapter(articleListFrag.getActivity(), articles);
+//                articleListFrag.setListAdapter(adapter);
+//                adapter.notifyDataSetChanged();
+//
+//            }
+//        });
+//		progress.dismiss();
+//	}
+
+
+    protected  void onPostExecute(final List<GoogleHotTrendItem>  itemList) {
+        Log.d(TAG, "POST EXECUTE");
+        articleListFrag.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for (Article a : articles) {
-                    Log.d("DB", "Searching DB for GUID: " + a.getGuid());
-                    DbAdapter dba = new DbAdapter(articleListFrag.getActivity());
-                    dba.openToRead();
-                    Article fetchedArticle = dba.getBlogListing(a.getGuid());
-                    dba.close();
-                    if (fetchedArticle == null) {
-                        Log.d("DB", "Found entry for first time: " + a.getTitle());
-                        dba = new DbAdapter(articleListFrag.getActivity());
-                        dba.openToWrite();
-                        dba.insertBlogListing(a.getGuid());
-                        dba.close();
-                    } else {
-                        a.setDbId(fetchedArticle.getDbId());
-                        a.setOffline(fetchedArticle.isOffline());
-                        a.setRead(fetchedArticle.isRead());
-                    }
+                for (GoogleHotTrendItem item : itemList) {
+                    Log.d(TAG, item.toString());
                 }
-                ArticleListAdapter adapter = new ArticleListAdapter(articleListFrag.getActivity(), articles);
-                articleListFrag.setListAdapter(adapter);
-                adapter.notifyDataSetChanged();
+
 
             }
         });
-		progress.dismiss();
-	}
-
+        progress.dismiss();
+    }
 
 	@Override
-	protected List<Article> doInBackground(String... urls) {
+	protected List<GoogleHotTrendItem> doInBackground(String... urls) {
 		String feed = urls[0];
 
 		URL url = null;
@@ -95,9 +111,8 @@ public class RssService extends AsyncTask<String, Void, List<Article>> {
 			xr.setContentHandler(rh);
 			xr.parse(new InputSource(url.openStream()));
 
-
 			Log.d(TAG, "PARSING FINISHED");
-			return rh.getArticleList();
+			return rh.getGoogleHotTrendItemList();
 
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage() + " >> " + e.toString());

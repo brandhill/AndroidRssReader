@@ -1,5 +1,6 @@
 package com.nerdability.android.rss.parser;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class RssHandler extends DefaultHandler {
 	private List<Article> articleList = new ArrayList<Article>();
 
     private List<GoogleHotTrendItem> hotTrendItems = new ArrayList<>();
-
+    private GoogleHotTrendItem currentTrendItem = new GoogleHotTrendItem();
 
 	// Number of articles added so far
 	private int articlesAdded = 0;
@@ -37,6 +38,10 @@ public class RssHandler extends DefaultHandler {
 		return articleList;
 	}
 
+    public List<GoogleHotTrendItem> getGoogleHotTrendItemList() {
+        return hotTrendItems;
+    }
+
 	/* 
 	 * This method is called everytime a start element is found (an opening XML marker)
 	 * here we always reset the characters StringBuffer as we are only currently interested
@@ -48,7 +53,7 @@ public class RssHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         chars = new StringBuffer();
-        Log.d(RssService.TAG, String.format("startElement, url : %s, localName : %s, qName : %s, atts : %s", uri, localName, qName, attributes.toString()));
+//        Log.d(RssService.TAG, String.format("startElement, url : %s, localName : %s, qName : %s, atts : %s", uri, localName, qName, attributes.toString()));
     }
 
     /*
@@ -67,39 +72,87 @@ public class RssHandler extends DefaultHandler {
     @Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 
-        Log.d(RssService.TAG, String.format("endElement, url : %s, localName : %s, qName : %s", uri, localName, qName));
-
-		if (localName.equalsIgnoreCase("title")){
-			currentArticle.setTitle(chars.toString());
-		} else if (localName.equalsIgnoreCase("description")){
-			currentArticle.setDescription(chars.toString());
-		} else if (localName.equalsIgnoreCase("published")){
-			currentArticle.setPubDate(chars.toString());
-		} else if (localName.equalsIgnoreCase("id")){
-			currentArticle.setGuid(chars.toString());
-		} else if (localName.equalsIgnoreCase("author")){
-			currentArticle.setAuthor(chars.toString());
-		} else if (localName.equalsIgnoreCase("content")){
-			currentArticle.setEncodedContent(chars.toString());
-		} else if (localName.equalsIgnoreCase("entry")){
-
-		} 
+//        Log.d(RssService.TAG, String.format("endElement, url : %s, localName : %s, qName : %s", uri, localName, qName));
 
 
-		// Check if looking for article, and if article is complete
-		if (localName.equalsIgnoreCase("entry")) {
+        if (localName.equalsIgnoreCase("title")){
+            currentTrendItem.setTitle(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("description")){
+            currentTrendItem.setDescription(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("link")){
+            currentTrendItem.setLink(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("pubDate")){
+            currentTrendItem.setPubDate(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("picture")){    //localName : picture, qName : ht:picture
+            if(!TextUtils.isEmpty(localName)){
+                currentTrendItem.setPicture("http:" +chars.toString());
+            }
+        }
+        else if (localName.equalsIgnoreCase("picture_source")){
+            currentTrendItem.setPicture_source(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("approx_traffic")){
+            currentTrendItem.setApprox_traffic(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("news_item_title")){
+            currentTrendItem.setNews_item_title(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("news_item_snippet")){
+            currentTrendItem.setNews_item_snippet(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("news_item_url")){
+            currentTrendItem.setNews_item_url(chars.toString());
+        }
+        else if (localName.equalsIgnoreCase("news_item_source")){
+            currentTrendItem.setNews_item_source(chars.toString());
+        }
 
-			articleList.add(currentArticle);
 
-			currentArticle = new Article();
+        if (localName.equalsIgnoreCase("item")) {
+            hotTrendItems.add(currentTrendItem);
+            currentTrendItem = new GoogleHotTrendItem();
+        }
 
-			// Lets check if we've hit our limit on number of articles
-			articlesAdded++;
-			if (articlesAdded >= ARTICLES_LIMIT)
-			{
-				throw new SAXException();
-			}
-		}
+
+//        if (localName.equalsIgnoreCase("title")){
+//			currentArticle.setTitle(chars.toString());
+//		} else if (localName.equalsIgnoreCase("description")){
+//			currentArticle.setDescription(chars.toString());
+//		} else if (localName.equalsIgnoreCase("published")){
+//			currentArticle.setPubDate(chars.toString());
+//		} else if (localName.equalsIgnoreCase("id")){
+//			currentArticle.setGuid(chars.toString());
+//		} else if (localName.equalsIgnoreCase("author")){
+//			currentArticle.setAuthor(chars.toString());
+//		} else if (localName.equalsIgnoreCase("content")){
+//			currentArticle.setEncodedContent(chars.toString());
+//		} else if (localName.equalsIgnoreCase("entry")){
+//
+//		}
+
+//        // Check if looking for article, and if article is complete
+//        if (localName.equalsIgnoreCase("entry")) {
+//
+//            articleList.add(currentArticle);
+//
+//            currentArticle = new Article();
+//
+//            // Lets check if we've hit our limit on number of articles
+//            articlesAdded++;
+//            if (articlesAdded >= ARTICLES_LIMIT)
+//            {
+//                throw new SAXException();
+//            }
+//        }
+
+
+
+
+
 	}
 
 
